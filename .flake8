@@ -1,0 +1,7 @@
+[flake8]
+max-line-length=89
+show-source=true
+enable-extensions=G
+import-order-style=pycharm
+application-import-names=yog_sothoth
+ignore=B008,B009

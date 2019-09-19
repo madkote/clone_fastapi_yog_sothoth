@@ -1,0 +1,27 @@
+image: "python:3.7"
+
+stages:
+  - Static Analysis
+  - Security Analysis
+
+flake8:
+  stage: Static Analysis
+  script:
+    - pip install flake8 flake8-rst-docstrings flake8-import-order flake8-blind-except
+        flake8-builtins flake8-logging-format flake8-docstrings flake8-quotes
+        flake8-debugger flake8-bugbear flake8-comprehensions flake8-eradicate
+        flake8-commas flake8-broken-line pep8-naming flake8-string-format
+        flake8-annotations-complexity flake8-executable
+    - flake8 yog_sothoth/
+
+pydocstyle:
+  stage: Static Analysis
+  script:
+    - pip install pydocstyle
+    - pydocstyle --explain yog_sothoth/
+
+bandit:
+  stage: Security Analysis
+  script:
+    - pip install bandit
+    - bandit -i -r yog_sothoth/

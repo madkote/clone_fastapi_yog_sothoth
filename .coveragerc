@@ -1,0 +1,5 @@
+[report]
+
+exclude_lines =
+    # This code cannot be detected as run by coverage, but it is being tested
+    if __name__ == .__main__.:

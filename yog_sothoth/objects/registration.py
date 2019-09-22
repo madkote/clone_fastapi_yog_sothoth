@@ -1,4 +1,5 @@
 """Registration object."""
+import copy
 import json
 import logging
 from dataclasses import dataclass
@@ -15,10 +16,11 @@ from aioredis import Redis
 
 from yog_sothoth import schemas
 from yog_sothoth import settings
-from yog_sothoth.utils.dataclass import asdict
 from yog_sothoth.utils.json import JSONEncoder
 
 logger = logging.getLogger(__name__)
+
+TUnorderedSeqStr = Union[Sequence[str], Set[str]]
 
 
 @dataclass
@@ -65,28 +67,30 @@ class Registration:
             memory_cost=argon2.DEFAULT_MEMORY_COST * 2,
             time_cost=argon2.DEFAULT_TIME_COST * 2,
         )
+    def _asdict(self, *, exclude: Optional[TUnorderedSeqStr] = None) -> Dict[str, any]:
+        """Convert `self` to a dictionary, optionally excluding some fields."""
+        result = []
+        for f in fields(self):
+            name = f.name
+            if name in exclude:
+                continue  # Skip
+            elif name[0] == '_' and hasattr(self, name[1:]):
+                name = name[1:]  # Remove underscore for attributes that have public prop
+            attr = copy.deepcopy(getattr(self, name))
+            result.append((name, attr))
+        return dict(result)
 
     def as_dict(self,
                 *,
                 hashed: bool = False,
-                hide: Optional[Sequence[str]] = None) -> Dict[str, any]:  # noqa: D202
+                hide: Optional[TUnorderedSeqStr] = None) -> Dict[str, any]:  # noqa: D202
         """Get object data as a dictionary.
 
         :param hashed: [optional] True to get secrets hashed.
         :param hide: [optional] Sequence of keys whose values are hidden from
                      the output (they are set as None).
         """
-
-        def is_hashed(value: str) -> bool:
-            """Check if a value is hashed or not."""
-            try:
-                argon2.extract_parameters(value)
-                hashed_ = True
-            except argon2.exceptions.InvalidHash:
-                hashed_ = False
-            return hashed_
-
-        data = asdict(self, skip_unpickable=True)
+        data = self._asdict(exclude={'cache'})
 
         # ToDo: improve all of this
         if 'cache' in data:

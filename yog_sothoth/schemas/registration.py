@@ -22,6 +22,7 @@ class MatrixRegStatusEnum(str, Enum):
     """User registration status options."""
 
     pending = 'pending'
+    processing = 'processing'
     success = 'success'
     failed = 'failed'
 

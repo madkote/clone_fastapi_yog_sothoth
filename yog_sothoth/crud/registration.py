@@ -28,11 +28,11 @@ class Registration:
         :param data: Registration schema model.
         :return: Created registration object if any.
         """
-        registration = objects.Registration(**data.dict())
+        registration = objects.Registration(**data.dict(), cache=self.cache)
         registration.generate_rid()
         registration.generate_token()
         registration.generate_manager_token()
-        registration.cache = self.cache
+        registration.generate_password()
         if await registration.save():
             return registration
 

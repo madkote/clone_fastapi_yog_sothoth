@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 def _get_hidden_fields_for_manager() -> Tuple[str, ...]:
-    return 'username', 'email', 'password', 'token'
+    return 'username', 'email', 'password', 'token', 'manager_token'
 
 
 async def get_object_or_404(cache: Redis, rid: str) -> objects.Registration:
@@ -42,6 +42,8 @@ async def _read(cache: Redis, authorization: str, rid: str) -> Dict[str, any]:
     if registration.verify_token(authorization):
         # It's a user
         for_manager = False
+        registration.token = authorization
+        registration.decrypt_password()
     elif registration.verify_manager_token(authorization):
         # It's a manager
         for_manager = True

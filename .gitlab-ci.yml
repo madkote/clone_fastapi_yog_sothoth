@@ -12,16 +12,16 @@ flake8:
         flake8-debugger flake8-bugbear flake8-comprehensions flake8-eradicate
         flake8-commas flake8-broken-line pep8-naming flake8-string-format
         flake8-annotations-complexity flake8-executable
-    - flake8 yog_sothoth/
+    - flake8 backend/yog_sothoth/
 
 pydocstyle:
   stage: Static Analysis
   script:
     - pip install pydocstyle
-    - pydocstyle --explain yog_sothoth/
+    - pydocstyle --explain backend/yog_sothoth/
 
 bandit:
   stage: Security Analysis
   script:
     - pip install bandit
-    - bandit -i -r yog_sothoth/
+    - bandit -i -r backend/yog_sothoth/

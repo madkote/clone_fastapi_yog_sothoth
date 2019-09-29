@@ -1,13 +1,28 @@
 # Yog-Sothoth: Matrix Self Register App
 
-A small [FastAPI](https://fastapi.tiangolo.com/) based app that allows anyone to register to a Matrix homeserver with admin approval.
+A small [FastAPI](https://fastapi.tiangolo.com/) backend and [svelte](https://svelte.dev/) frontend app that allows anyone to register to a Matrix homeserver with admin approval.
 
 > Yog-Sothoth knows the gate. Yog-Sothoth is the gate. Yog-Sothoth is the key and guardian of the gate.
 
-## Basic flow and idea
+## Basic Flow and Idea
 
-A user creates a new registration sending its username and optionally an email. It receives a unique identifier and a token to access its data.  
-Then a manager can approve or reject the registration. If the user gave an email address it will receive an email with the information. Otherwise, it will be able to find that information on the app using its token.
+A user creates a new registration sending optionally an email to receive notification. It receives a registration unique identifier (*rid*) and a *token* to access its data. If the user doesn't input an email it will have to manually check how the registration request status is going using its token.
+
+When a registration request is received, an email is sent to the managers containing the *manager token* and the registration unique identifier (*rid*). Then any manager can approve or reject the registration using this token.
+
+A registration request can be deleted by its user or automatically after a certain amount of time (48hs by default).
+
+Currently, registrations can only be updated once: they're either approved or rejected and that's it.
+
+Once the registration is approved, the user is required to send its username and optionally an email (again, to receive notifications). A password is sent back as response and an account is created in the Matrix homeserver with the given username.
+
+### Security Characteristics
+
+The user and manager tokens are stored as an Argon2id hash.  The username and password is never stored, only the user email if any (but can not be seen by any manager, no matter what).
+When a manager requests user's data, it will only receive information about the status and timestamps, but won't be able to see any other information.
+Both the user and managers share information using the *rid*. This permits for a user's data to remain unknown for the managers but enables potential human interaction with each other, i.e.: asking in a group if someone sent a registration request.
+
+Note: the user email is stored in plaintext. This means that a system administrator could access the database and see this value (this means a user with root access to the Operating System, not a *manager*).
 
 ### Diagrams
 
@@ -17,35 +32,18 @@ Then a manager can approve or reject the registration. If the user gave an email
 
 ![Failed registration](docs/imgs/failed_registration.png)
 
-## API Endpoints
+# Deployment
 
-* `/registrations/`: User registrations
-  * **POST**: New user registration.
-    * Request: `{"username": "<username>", "email": "[<email>]"}`
-    * Response: *201* `{"username": "<username>", "email": "<email>", "password": null, "rid": "<registration identifier>", "token": "<token>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "pending", "registration_status": "pending"}`, *422*
-* `/registrations/:rid/`: Manage a user registration
-  * **GET**: Show user information according to access token: minimal or full.
-    * Request: `null` `Authorization: <manager_token>`
-    * Response: *200* `{"username": null, "email": null, "password": null, "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "<pending/approved/rejected>", "registration_status": "<pending/success/failed>"}`, *401* `null`, *403* `null`, *404* `null`
-    * Request: `null` `Authorization: <user_token>`
-    * Response: *200* `{"username": "<username>", "email": "<email>", "password": "<password>", "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "<pending/approved/rejected>", "registration_status": "<pending/success/failed>"}`, *401* `null`, *403* `null`, *404* `null`
-  * **PUT**: Change registration status
-    * Request: `{"status": "approved"}` `Authorization: <manager_token>`
-    * Response: *200* `{"username": null, "email": null, "password": null, "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "approved", "registration_status": "pending"}`, *401* `null`, *403* `null`, *404* `null`, *422*
-    * Request: `{"status": "rejected"}` `Authorization: <manager_token>`
-    * Response: *200* `{"username": null, "email": null, "password": null, "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "rejected", "registration_status": "pending"}`, *401* `null`, *403* `null`, *404* `null`, *422*
-  * **DELETE**: Remove registration.
-    * Request: `null` `Authorization: <manager_token>`
-    * Response: *204* `{"username": null, "email": null, "password": null, "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "<pending/approved/rejected>", "registration_status": "<pending/success/failed>"}`, *401* `null`, *403* `null`, *404* `null`
-    * Request: `null` `Authorization: <user_token>`
-    * Response: *204* `{"username": "<username>", "email": "<email>", "password": "<password>", "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "<pending/approved/rejected>", "registration_status": "<pending/success/failed>"}`, *401* `null`, *403* `null`, *404* `null`
+We have built a Docker image for the API back-end (the front-end uses solely Nginx), get it from [the repo](https://git.rlab.be/sysadmins/yog_sothoth/container_registry). Note that the back-end image uses Gunicorn as server and it is prepared to be used with Nginx as a proxy. DO NOT use it directly without an Nginx proxy.  
+Additionally, sample compose and Nginx config files are found in the [deploy](deploy) subdirectory. Simply copy them to your server and run them.
 
 ## License
 
-**Yog-Sothoth** is made by [Erus](https://erudin.github.io/) and [HacKan](https://hackan.net) under GNU GPL v3.0+. You are free to use, share, modify and share modifications under the terms of that [license](LICENSE).
+**Yog-Sothoth** is made by [Erus](https://erudin.github.io/), [Fedr](https://fedr.cc/) and [HacKan](https://hackan.net) under GNU GPL v3.0+. You are free to use, share, modify and share modifications under the terms of that [license](LICENSE).
 
     Copyright (C) 2019
      Erus (https://erudin.github.io/)
+     Fedr (https://fedr.cc/)
      HacKan (https://hackan.net)
 
     This program is free software: you can redistribute it and/or modify

@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "yog_sothoth"
+version = "0.1.0"
+description = "Matrix Self Register"
+license = "GPL-3.0+"
+authors = ["hackan <hackan@rlab.be>", "erus <erus@rlab.be>"]
+readme = "README.md"
+repository = "https://git.rlab.be/sysadmins/matrix-self-register"
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Natural Language :: English",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+include = ["pyproject.toml"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+fastapi = "^0.36.0"
+uvicorn = "^0.8.6"
+gunicorn = "^19.9.0"
+email-validator = "^1.0.4"
+aioredis = "^1.2.0"
+hiredis = "^1.0.0"
+argon2-cffi = "^19.1.0"
+aiosmtplib = "^1.1.0"
+requests = "^2.22.0"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^3.7.8"
+flake8-rst-docstrings = "^0.0.11"
+flake8-import-order = "^0.18.1"
+flake8-blind-except = "^0.1.1"
+flake8-builtins = "^1.4.1"
+flake8-logging-format = "^0.6.0"
+flake8-docstrings = "^1.4.0"
+flake8-quotes = "^2.1.0"
+flake8-debugger = "^3.1.0"
+flake8-bugbear = "^19.8.0"
+flake8-comprehensions = "^2.2.0"
+flake8-bandit = "^2.1.1"
+pydocstyle = "^4.0.1"
+bandit = "^1.6.2"
+flake8-commas = "^2.0.0"
+flake8-eradicate = "^0.2.1"
+flake8-broken-line = "^0.1.1"
+pep8-naming = "^0.8.2"
+flake8-string-format = "^0.2.3"
+flake8-annotations-complexity = "^0.0.2"
+flake8-executable = "^2.0.3"
+invoke = "^1.3.0"
+aiosmtpd = "^1.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

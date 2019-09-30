@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <title>Yog-Sothoth</title>
+    <meta name="author" content="Erus" />
+    <meta name="description" content="Matrix Self Register App" />
+
+    <link rel="shortcut icon" type="image/png" href="assets/imgs/favicon.png" id="favicon" />
+
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css?v=4.3.1" />
+    <link rel="stylesheet" href="assets/css/cover.min.css?cache=20190930" />
+    <link rel="stylesheet" href="assets/css/custom.css?cache=20190930" />
+</head>
+<body>
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <header class="masthead mb-auto text-center">
+            <div class="inner">
+                <nav class="nav nav-masthead justify-content-center">
+                    <a class="nav-link active"
+                        href="#"
+                        title="Yog-Sothoth">
+                        <span class="fas fa-home" aria-hidden="true"></span>
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <main role="main" class="inner cover text-center">
+            <h1 class="cover-heading">Yog-Sothoth: Guardian of the Gate</h1>
+            <p class="lead">Yog-Sothoth allows you to create a Matrix account once the
+                request is approved by the Gate Keepers.</p>
+            <p>For more information, contact us at <code>[CONTACT ADDRESS]</code>.</p>
+        </main>
+
+        <div id="options" class="text-center">
+            <p class="lead">Dear user: First create your registration request which can be approved or rejected. If approved proceed to create your Matrix account.</p>
+            <p>
+                <button class="btn btn-outline-danger" type="button" data-toggle="collapse" data-target="#createRequest" aria-expanded="false" aria-controls="createRequest">
+                Create request
+                </button>
+                <button class="btn btn-outline-danger" type="button" data-toggle="collapse" data-target="#viewRequest" aria-expanded="false" aria-controls="viewRequest">
+                View request
+                </button>
+                <button class="btn btn-outline-danger" type="button" data-toggle="collapse" data-target="#approveReject" aria-expanded="false" aria-controls="approveReject">
+                Approve/reject request
+                </button>
+                <button class="btn btn-outline-danger" type="button" data-toggle="collapse" data-target="#createAccount" aria-expanded="false" aria-controls="createAccount">
+                Create account
+                </button>
+                <button class="btn btn-outline-danger" type="button" data-toggle="collapse" data-target="#deleteRequest" aria-expanded="false" aria-controls="deleteRequest">
+                Delete request
+                </button>
+            </p>
+            <div class="collapse" id="createRequest">
+                <div class="card card-body">
+                    <p>If you want to receive notifications about your request write your email address. You will be able to choose a <em>username</em> once the request is approved.</p>
+                    <form action="" id="createRequestForm">
+                        <label for="email">
+                            <input type="email" name="email" placeholder="Optional email address"/>
+                        </label>
+                        <input type="submit" value="Send request" class="btn btn-dark btn-primary">
+                    </form>
+                    <p id="createRequestResponse" class="text-left"></p>
+                </div>
+            </div>
+
+            <div class="collapse" id="viewRequest">
+                <div class="card card-body">
+                    <form action="" id="viewRequestForm">
+                        <label for="rid">
+                            <input type="text" name="rid" required placeholder="Registration ID"/>
+                        </label>
+                        <label for="token">
+                            <input type="text" name="token" required placeholder="Token"/>
+                        </label>
+                        <input class="btn btn-dark btn-primary" type="submit" value="Get request info"/>
+                    </form>
+                    <p id="viewRequestResponse" class="text-left"></p>
+                </div>
+            </div>
+
+            <div class="collapse" id="approveReject">
+                <div class="card card-body">
+                    <form action="" id="approveRejectForm">
+                        <label for="rid">
+                            <input type="text" name="rid" required placeholder="Registration ID"/>
+                        </label>
+                        <label for="token">
+                            <input type="text" name="token" required placeholder="Token"/>
+                        </label>
+                        <label for="status">
+                            <select name="status" required>
+                                <option value="">Choose one</option>
+                                <option value="approved">Approve</option>
+                                <option value="rejected">Reject</option>
+                            </select>
+                        </label>
+                        <input type="submit" value="Update status" class="btn btn-dark btn-primary">
+                    </form>
+                    <p id="approveRejectResponse" class="text-left"></p>
+                </div>
+            </div>
+
+            <div class="collapse" id="createAccount">
+                <div class="card card-body">
+                    <form action="" id="createAccountForm">
+                        <label for="rid">
+                            <input type="text" name="rid" required placeholder="Registration ID"/>
+                        </label>
+                        <label for="token">
+                            <input type="text" name="token" required placeholder="Token"/>
+                        </label>
+                        <label for="username">
+                            <input type="text" name="username" required placeholder="Account username"/>
+                        </label>
+                        <label for="matrix_status">
+                            <select name="matrix_status" required>
+                                <option value="processing" selected>Processing</option>
+                            </select>
+                        </label>
+                        <input type="submit" value="Create account" class="btn btn-dark btn-primary">
+                    </form>
+                    <p id="createAccountResponse" class="text-left"></p>
+                </div>
+            </div>
+
+            <div class="collapse" id="deleteRequest">
+                <div class="card card-body">
+                    <form action="" id="deleteRequestForm">
+                        <label for="rid">
+                            <input type="text" name="rid" required placeholder="Registration ID"/>
+                        </label>
+                        <label for="token">
+                            <input type="text" name="token" required placeholder="Token"/>
+                        </label>
+                        <input type="submit" value="Delete request" class="btn btn-dark btn-primary">
+                    </form>
+                    <p id="deleteRequestResponse" class="text-left"></p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mastfoot mt-auto text-center">
+            <div class="inner">
+                <p>Yog-Sothoth - GNU GPL v3.0+</p>
+                <p><small>Based on Cover template for <a
+                    href="https://getbootstrap.com">Bootstrap</a>, by <a
+                    href="https://twitter.com/mdo">@mdo</a>. Uses pretty <a
+                href="https://fontawesome.com/icons">Fontawesome Icons</a>.</small></p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="vendor/jquery/jquery.min.js?v=3.4.1"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js?v=4.3.1"></script>
+    <script src="assets/js/actions.js?cache=20190930" defer></script>
+</body>
+</html>

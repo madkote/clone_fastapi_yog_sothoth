@@ -20,6 +20,8 @@ services:
       - frontend
     env_file:
       - .env
+    environment:
+      - YOG_API_PREFIX=/api
 
   nginx:
     image: nginx:mainline-alpine

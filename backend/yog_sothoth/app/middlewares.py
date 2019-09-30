@@ -1,6 +1,5 @@
 """Application middlewares."""
 from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from yog_sothoth.conf import settings
@@ -26,6 +25,3 @@ app.add_middleware(
     allow_credentials=False,
     max_age=24 * 3600,
 )
-
-if not settings.DEBUG:
-    app.add_middleware(HTTPSRedirectMiddleware)

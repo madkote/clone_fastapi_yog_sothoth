@@ -2,14 +2,6 @@
 FROM python:3.7-alpine AS builder
 
 ARG PYTHONUNBUFFERED=1
-ARG REQ_PIPENV_VERSION=2018.11.26
-ARG REQ_PIPENV_HASH=sha256:56ad5f5cb48f1e58878e14525a6e3129d4306049cb76d2f6a3e95df0d5fc6330
-ARG REQ_CERTIFI_VERSION=2019.6.16
-ARG REQ_CERTIFI_HASH=sha256:046832c04d4e752f37383b628bc601a7ea7211496b4638f6514d0e5b9acc4939
-ARG REQ_VIRTUALENV_VERSION=16.6.1
-ARG REQ_VIRTUALENV_HASH=sha256:d28ca64c0f3f125f59cabf13e0a150e1c68e5eea60983cc4395d88c584495783
-ARG REQ_VIRTUALENV_CLONE_VERSION=0.5.3
-ARG REQ_VIRTUALENV_CLONE_HASH=sha256:532f789a5c88adf339506e3ca03326f20ee82fd08ee5586b44dc859b5b4468c5
 
 RUN apk update \
     && apk add --no-cache \
@@ -20,10 +12,10 @@ RUN apk update \
     && rm -rf /var/cache/apk/*
 
 # Export Yog-Sothoth API requirements file
-COPY . /src/
-RUN cd /src/ \
+WORKDIR /src/
+COPY . .
     # install poetry
-    && pip install --no-cache-dir --requirement poetry.requirements.txt \
+RUN pip install --no-cache-dir --requirement poetry.requirements.txt \
     # export app requirements
     && poetry export --format requirements.txt --output app.requirements.txt \
     # build app
@@ -88,19 +80,14 @@ RUN addgroup -g "${APP_USER_GID}" "${APP_USER}" \
 COPY --from=installer /usr/local/lib/python3.7/site-packages /usr/local/lib/python3.7/site-packages
 
 # Reinstall Gunicorn for it to be present as a local binary
-RUN cd /tmp \
-    && echo -n > gunicorn_req.txt \
-    && echo "gunicorn==${GUNICORN_VERSION} --hash=${GUNICORN_HASH}" >> gunicorn_req.txt \
+RUN printf "%s" "gunicorn==${GUNICORN_VERSION} --hash=${GUNICORN_HASH}" > /tmp/gunicorn_req.txt \
     && pip install --no-cache-dir --force-reinstall --requirement /tmp/gunicorn_req.txt \
     && rm /tmp/gunicorn_req.txt
 
 WORKDIR "${APP_ROOT}"
 
-# Copy Gunicorn settings
-COPY --chown=app:app yog_sothoth/conf/gunicorn.py ./
-
 EXPOSE 8000
 
 # Drop privs
 USER ${APP_USER}
-CMD ["gunicorn", "--config", "/srv/app/gunicorn.py", "yog_sothoth.app:app"]
+CMD ["gunicorn", "--config", "/usr/local/lib/python3.7/site-packages/yog_sothoth/conf/gunicorn.py", "yog_sothoth.app:app"]

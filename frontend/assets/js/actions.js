@@ -14,7 +14,7 @@ function sendAuthenticatedRequest(method, rid, token, objectId, body=null) {
             'Basic ' + btoa(rid + ":" + token)
         );
     }
-    let url = 'http://127.0.0.1:8000/api/v1/registrations/' + rid + '/';
+    let url = 'api/v1/registrations/' + rid + '/';
     if (body) {
         body = JSON.stringify(body);
     } else {
@@ -54,7 +54,7 @@ function createRegistration() {
     $.each($('#createRequestForm').serializeArray(), function(i, field) {
         values[field.name] = field.value;
     });
-    let url = 'http://127.0.0.1:8000/api/v1/registrations/';
+    let url = 'api/v1/registrations/';
     let body;
     if (values['email']) {
         body = JSON.stringify(values);

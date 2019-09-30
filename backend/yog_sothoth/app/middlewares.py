@@ -21,7 +21,7 @@ app.add_middleware(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allow_headers=['Authorization', 'Content-Type'],
     allow_credentials=False,
     max_age=24 * 3600,

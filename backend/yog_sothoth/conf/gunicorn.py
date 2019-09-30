@@ -4,8 +4,8 @@ by HacKan (https://hackan.net)
 Find it at: https://gist.github.com/HacKanCuBa/275bfca09d614ee9370727f5f40dab9e
 Based on: https://gist.github.com/KodeKracker/6bc6a3a35dcfbc36e2b7
 """
-# Gunicorn(v19.3) Configuration File
-# Reference - http://docs.gunicorn.org/en/19.3/settings.html
+# Gunicorn (v19.9) Configuration File
+# Reference - https://docs.gunicorn.org/en/19.9.0/settings.html
 #
 # To run gunicorn by using this config, run gunicorn by passing
 # config file path, ex:
@@ -41,7 +41,9 @@ workers = multiprocessing.cpu_count() * 2 + 1
 # 2. eventlet - Requires eventlet >= 0.9.7
 # 3. gevent - Requires gevent >= 0.13
 # 4. tornado - Requires tornado >= 0.2
-# 5. uvicorn - uvicorn.workers.UvicornWorker
+# 5. gthread - Python 2 requires the futures package to be installed (or
+# install it via pip install gunicorn[gthread])
+# 6. uvicorn - uvicorn.workers.UvicornWorker
 #
 # You’ll want to read http://docs.gunicorn.org/en/latest/design.html
 # for information on when you might want to choose one of the other
@@ -73,7 +75,7 @@ max_requests_jitter = 1000
 
 # timeout - Workers silent for more than this many seconds are killed
 # and restarted
-timeout = 600
+timeout = 30
 
 # graceful_timeout - Timeout for graceful workers restart
 # How max time worker can handle request after got restart signal.
@@ -113,6 +115,17 @@ limit_request_field_size = 1024
 # reload - Restart workers when code changes
 reload = False
 
+# reload_engine - The implementation that should be used to power reload.
+# Valid engines are:
+#     ‘auto’ (default)
+#     ‘poll’
+#     ‘inotify’ (requires inotify)
+reload_engine = 'auto'
+
+# reload_extra_files - Extends reload option to also watch and reload on
+# additional files (e.g., templates, configurations, specifications, etc.).
+reload_extra_files = []
+
 # spew - Install a trace function that spews every line executed by the server
 spew = False
 
@@ -128,10 +141,13 @@ check_config = False
 # speed up server boot times. Although, if you defer application loading to
 # each worker process, you can reload your application code easily by
 # restarting workers.
-preload = True
+preload_app = True
 
 # sendfile - Enables or disables the use of sendfile()
 sendfile = False
+
+# reuse_port - Set the SO_REUSEPORT flag on the listening socket.
+reuse_port = False
 
 # chdir - Chdir to specified directory before apps loading
 chdir = ''
@@ -171,6 +187,11 @@ group = None
 # “0022” are valid for decimal, hex, and octal representations)
 umask = 0
 
+# initgroups - If true, set the worker process’s group access list with all of
+# the groups of which the specified username is a member, plus the specified
+# group id.
+initgroups = False
+
 # tmp_upload_dir - Directory to store temporary request data as they are read
 # This path should be writable by the process permissions set for Gunicorn
 # workers. If not specified, Gunicorn will choose a system generated temporary
@@ -192,7 +213,18 @@ secure_scheme_headers = {
 # Set to “*” to disable checking of Front-end IPs (useful for setups where
 # you don’t know in advance the IP address of Front-end, but you still trust
 # the environment)
-forwarded_allow_ips = 'nginx'  # Docker service
+forwarded_allow_ips = '*'
+
+# pythonpath - A comma-separated list of directories to add to the Python path.
+# e.g. '/home/djangoprojects/myproject,/home/python/mylibrary'.
+pythonpath = None
+
+# paste - Load a PasteDeploy config file. The argument may contain a # symbol
+# followed by the name of an app section from the config file,
+# e.g. production.ini#admin.
+# At this time, using alternate server blocks is not supported. Use the command
+# line arguments to control server configuration instead.
+paste = None
 
 # proxy_protocol - Enable detect PROXY protocol (PROXY mode).
 # Allow using Http and Proxy together. It may be useful for work with stunnel
@@ -205,7 +237,15 @@ proxy_protocol = False
 # Set to “*” to disable checking of Front-end IPs (useful for setups where you
 # don’t know in advance the IP address of Front-end, but you still trust the
 # environment)
-proxy_allow_from = '127.0.0.1'
+proxy_allow_ips = '127.0.0.1'
+
+# raw_paste_global_conf - Set a PasteDeploy global config variable in key=value
+# form.
+# The option can be specified multiple times.
+# The variables are passed to the the PasteDeploy entrypoint. Example:
+# $ gunicorn -b 127.0.0.1:8000 --paste development.ini --paste-global FOO=1
+# --paste-global BAR=2
+raw_paste_global_conf = []
 
 # ===============================================
 #           SSL
@@ -241,8 +281,8 @@ ciphers = 'TLSv1'
 # ===============================================
 
 # accesslog - The Access log file to write to.
-# “-” means log to stderr.
-access_logfile = '-'
+# “-” means log to stdout.
+accesslog = '-'
 
 # access_log_format - The access log format
 #
@@ -264,13 +304,16 @@ access_logfile = '-'
 # {Header}i  -> request header
 # {Header}o  -> response header
 # ---------------------------------------------------------------
-access_logformat = (
+access_log_format = (
     '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 )
 
+# disable_redirect_access_to_syslog - Disable redirect access logs to syslog.
+disable_redirect_access_to_syslog = False
+
 # errorlog - The Error log file to write to.
 # “-” means log to stderr.
-error_logfile = '-'
+errorlog = '-'
 
 # loglevel - The granularity of Error log outputs.
 # Valid level names are:
@@ -279,7 +322,10 @@ error_logfile = '-'
 # 3. warning
 # 4. error
 # 5. critical
-log_level = 'info'
+loglevel = 'info'
+
+# capture_output - Redirect stdout/stderr to specified file in errorlog.
+capture_output = False
 
 # logger_class - The logger you want to use to log events in gunicorn.
 # The default class (gunicorn.glogging.Logger) handle most of normal usages
@@ -288,7 +334,15 @@ logger_class = 'gunicorn.glogging.Logger'
 
 # logconfig - The log config file to use. Gunicorn uses the standard Python
 # logging module’s Configuration file format.
-log_config = None
+logconfig = None
+
+# logconfig_dict - The log config dictionary to use, using the standard
+# Python logging module’s dictionary configuration format. This option
+# takes precedence over the logconfig option, which uses the older file
+# configuration format.
+# Format:
+# https://docs.python.org/3/library/logging.config.html#logging.config.dictConfig
+logconfig_dict = {}
 
 # syslog_addr - Address to send syslog messages.
 #
@@ -298,19 +352,19 @@ log_config = None
 #                      ‘stream’ is the default.
 # ‘udp://HOST:PORT’ : for UDP sockets
 # ‘tcp://HOST:PORT‘ : for TCP sockets
-log_syslog_to = 'udp://localhost:514'
+syslog_addr = 'udp://localhost:514'
 
 # syslog - Send Gunicorn logs to syslog
-log_syslog = False
+syslog = False
 
 # syslog_prefix - Makes gunicorn use the parameter as program-name in the
 # syslog entries.
 # All entries will be prefixed by gunicorn.<prefix>. By default the program
 # name is the name of the process.
-log_syslog_prefix = None
+syslog_prefix = None
 
 # syslog_facility - Syslog facility name
-log_syslog_facility = 'user'
+syslog_facility = 'user'
 
 # enable_stdio_inheritance - Enable stdio inheritance
 # Enable inheritance for stdio file descriptors in daemon mode.
@@ -323,7 +377,7 @@ statsd_host = None
 
 # statsd_prefix - Prefix to use when emitting statsd metrics (a trailing . is
 # added, if not provided)
-# statsd-prefix = "."
+statsd_prefix = ''
 
 
 # ===============================================
@@ -333,7 +387,7 @@ statsd_host = None
 # proc_name - A base to use with setproctitle for process naming.
 # This affects things like `ps` and `top`.
 # It defaults to ‘gunicorn’.
-name = 'yog_sothoth'
+proc_name = 'yog_sothoth'
 
 
 # ===============================================
@@ -397,7 +451,7 @@ def post_worker_init(worker):
     pass
 
 
-def worker_init(worker):
+def worker_int(worker):
     """
     Execute code just after a worker exited on SIGINT or SIGQUIT.
 
@@ -444,6 +498,16 @@ def post_request(worker, req, environ, resp):
 
     The callable needs to accept two instance variables for the Worker and
     the Request.
+    """
+    pass
+
+
+def child_exit(server, worker):
+    """
+    Execute code just after a worker has been exited, in the master process.
+
+    The callable needs to accept two instance variables for the Arbiter and the
+    just-exited Worker.
     """
     pass
 

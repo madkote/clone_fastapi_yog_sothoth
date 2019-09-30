@@ -56,7 +56,7 @@ def aiosmtpd(ctx):
 
 @task
 def build(ctx, tag='latest'):
-    """Build Yog Sothoth API Docker image."""
+    """Build Yog-Sothoth API Docker image."""
     ctx.run(f'sudo docker build --compress --pull --rm --tag '
             f'registry.rlab.be/sysadmins/yog_sothoth:{tag} .', echo=True, pty=True,
             echo_stdin=False)

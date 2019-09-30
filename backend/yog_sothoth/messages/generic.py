@@ -85,6 +85,6 @@ def signature(*, html: bool = False) -> List[str]:
         f'  Please DO NOT reply to this email.',
         f'',
         f'Regards,',
-        f'Yog Sothoth, the key and guardian of the gate.',
+        f'Yog-Sothoth, the key and guardian of the gate.',
         f'',
     ]

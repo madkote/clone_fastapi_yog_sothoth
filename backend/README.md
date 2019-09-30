@@ -1,4 +1,4 @@
-# Yog-Sothoth: Matrix Self Register App
+# Yog-Sothoth Backend
 
 A small [FastAPI](https://fastapi.tiangolo.com/) based app that allows anyone to register to a Matrix homeserver with admin approval.
 

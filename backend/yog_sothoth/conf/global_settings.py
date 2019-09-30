@@ -1,4 +1,4 @@
-"""Settings for Yog Sothoth."""
+"""Settings for Yog-Sothoth."""
 import os
 from typing import Optional
 from typing import Tuple

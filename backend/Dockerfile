@@ -19,7 +19,7 @@ RUN apk update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apk/*
 
-# Export Yog Sothoth API requirements file
+# Export Yog-Sothoth API requirements file
 COPY . /src/
 RUN cd /src/ \
     # install poetry
@@ -55,7 +55,7 @@ RUN pip install --no-cache-dir --requirement /tmp/app/app.requirements.txt \
 # Final stage
 FROM python:3.7-alpine
 
-LABEL description="Docker image for Yog Sothoth API"
+LABEL description="Docker image for Yog-Sothoth API"
 LABEL maintainer="HacKan <hackan@rlab.be>"
 LABEL vendor="R'lyeh Hacklab Sysadmins"
 LABEL vendor.url="https://adm.rlab.be"

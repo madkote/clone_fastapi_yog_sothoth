@@ -11,7 +11,7 @@ check_settings()
 description = (f'Self-registration app for Matrix homeserver'
                f'{" (DEV MODE)" if settings.DEVELOPMENT_MODE else ""}')
 app = FastAPI(
-    title='Yog Sothoth',
+    title='Yog-Sothoth',
     description=description,
     version=get_project_version(),
     debug=settings.DEBUG,

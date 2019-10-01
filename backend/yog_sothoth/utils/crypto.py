@@ -2,10 +2,11 @@
 import logging
 from abc import ABC
 from abc import abstractmethod
-from multiprocessing import cpu_count
 from typing import Union
 
 import argon2
+
+from yog_sothoth.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +36,9 @@ class Hasher(HasherBaseInterface):
     def __init__(self):
         """Hash and verify values."""
         self._hasher = argon2.PasswordHasher(
-            parallelism=cpu_count() * 2,
-            memory_cost=argon2.DEFAULT_MEMORY_COST * 2,
-            time_cost=argon2.DEFAULT_TIME_COST * 2,
+            parallelism=settings.ARGON2_PARALLELISM,
+            memory_cost=settings.ARGON2_MEMORY_COST,
+            time_cost=settings.ARGON2_TIME_COST,
         )
 
     def hash(self, value: Union[bytes, str]) -> str:  # noqa: A003
@@ -60,11 +61,23 @@ class Hasher(HasherBaseInterface):
         return False
 
     @staticmethod
-    def is_hashed(value: str) -> bool:
+    def is_hashed(value: Union[bytes, str]) -> bool:
         """Check if a value is hashed or not."""
+        if not isinstance(value, str):
+            return False
+
         try:
             argon2.extract_parameters(value)
             hashed = True
         except argon2.exceptions.InvalidHash:
             hashed = False
         return hashed
+
+    def hash_if_not_hashed(self, value: Union[bytes, str]) -> str:
+        """Check if a value is hashed and if not, hash it.
+
+        :return: Hashed value.
+        """
+        if self.is_hashed(value):
+            return value
+        return self.hash(value)

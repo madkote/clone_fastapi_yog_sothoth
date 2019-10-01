@@ -1,4 +1,5 @@
 """Registration object."""
+import asyncio
 import copy
 import json
 import logging
@@ -96,7 +97,7 @@ class Registration:
             result.append((name, attr))
         return dict(result)
 
-    def as_dict(self,
+    async def as_dict(self,
                 *,
                 hashed: bool = False,
                 hide: Optional[TUnorderedSeqStr] = None) -> Dict[str, any]:  # noqa: D202
@@ -114,16 +115,23 @@ class Registration:
 
         if hashed:
             hasher = Hasher()
-            data['token'] = (
-                self.token
-                if hasher.is_hashed(self.token)
-                else hasher.hash(self.token)
+            # Parallelize hashing
+            loop = asyncio.get_running_loop()
+            hashed_token_future = loop.run_in_executor(
+                None,
+                hasher.hash_if_not_hashed,
+                self.token,
             )
-            data['manager_token'] = (
-                self.manager_token
-                if hasher.is_hashed(self.manager_token)
-                else hasher.hash(self.manager_token)
+            hashed_manager_token_future = loop.run_in_executor(
+                None,
+                hasher.hash_if_not_hashed,
+                self.manager_token,
             )
+            hashed_token, hashed_manager_token = await asyncio.gather(
+                hashed_token_future,
+                hashed_manager_token_future,
+            )
+            data['token'], data['manager_token'] = hashed_token, hashed_manager_token
 
         if hide:
             data.update({key: None for key in hide})
@@ -140,17 +148,17 @@ class Registration:
                 if hasattr(self, key):
                     setattr(self, key, value)
 
-    def as_json(self,
-                *,
-                hashed: bool = False,
-                hide: Optional[Sequence[str]] = None) -> str:
+    async def as_json(self,
+                      *,
+                      hashed: bool = False,
+                      hide: Optional[Sequence[str]] = None) -> str:
         """Get the object data as a JSON encoded string.
 
         :param hashed: [optional] True to get secrets hashed.
         :param hide: [optional] Sequence of keys whose values are hidden from
                      the output (they are set as None).
         """
-        data = self.as_dict(hashed=hashed, hide=hide)
+        data = await self.as_dict(hashed=hashed, hide=hide)
         # Convert datetimes to string
         return json.dumps(data, cls=JSONEncoder)
 
@@ -200,7 +208,7 @@ class Registration:
         :return: True if storing is successful, False otherwise.
         """
         self.modification = datetime.now()
-        json_data = self.as_json(hashed=True)
+        json_data = await self.as_json(hashed=True)
         result = await self.cache.set(self.rid, json_data, expire=settings.CACHE_TTL)
         if not result:
             # There's no reason why saving would fail, so log it

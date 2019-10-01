@@ -48,7 +48,7 @@ async def create_registration_request(
     background_tasks.add_task(tasks.task_notify_managers_registration_received,
                               registration_crud.registration)
 
-    return registration_crud.registration.as_dict()
+    return await registration_crud.registration.as_dict()
 
 
 @router.get('/{rid}/', response_model=schemas.RegistrationInfoReduced)
@@ -75,7 +75,7 @@ async def read_registration_request(
     await registration_crud.read()  # Exists because the credentials are valid
 
     hide = _get_hidden_fields_for_manager() if api_user.is_manager else None
-    return registration_crud.registration.as_dict(hide=hide)
+    return await registration_crud.registration.as_dict(hide=hide)
 
 
 @router.put('/{rid}/', response_model=schemas.RegistrationInfoReduced)
@@ -121,7 +121,7 @@ async def approve_or_reject_registration_request(
                               registration_crud.registration)
 
     hide = _get_hidden_fields_for_manager()
-    return registration_crud.registration.as_dict(hide=hide)
+    return await registration_crud.registration.as_dict(hide=hide)
 
 
 @router.patch('/{rid}/', response_model=schemas.RegistrationInfoReduced)
@@ -171,7 +171,7 @@ async def create_account_once_approved(
     background_tasks.add_task(tasks.task_create_matrix_account,
                               registration_crud.registration)
 
-    return registration_crud.registration.as_dict()
+    return await registration_crud.registration.as_dict()
 
 
 @router.delete('/{rid}/', response_model=schemas.RegistrationInfoReduced)
@@ -204,4 +204,4 @@ async def delete_registration_request(
         raise HTTPException(status.HTTP_507_INSUFFICIENT_STORAGE,
                             detail='Delete operation failed for an unknown reason')
 
-    return registration_crud.registration.as_dict()
+    return await registration_crud.registration.as_dict()

@@ -128,6 +128,23 @@ MANAGERS_ADDRESSES: Tuple[str] = tuple(
 # (it will be public)
 CONTACT_ADDRESS: str = os.getenv('YOG_CONTACT_ADDRESS', '')
 
+# Token hashing parameters for Argon2 (defaults are more or less sane but requires
+# testing, please adjust to needs: the goal is to take no more than 200ms on any
+# hashing operation - note that the specs recommend 500ms but the operation we
+# are doing doesn't require such level of security). Test the time taken in the
+# server with:
+# python -m timeit -r 10 -n 5 'import argon2; argon2.PasswordHasher(parallelism=8,
+# memory_cost=(102400//16), time_cost=1).hash("A" * 11)'
+# Leave all params as default and test; then set parallelism equal to twice the
+# number of cores; then lower the time_cost down to 1; finally start reducing
+# memory_cost.
+# Parallelism (number of threads) (defaults to 8)
+ARGON2_PARALLELISM = int(os.getenv('YOG_ARGON2_PARALLELISM', 8))
+# Memory cost in kibibytes (defaults to 102400)
+ARGON2_MEMORY_COST = int(os.getenv('YOG_ARGON2_MEMORY_COST', 102400))
+# Time cost in seconds (defaults to 2)
+ARGON2_TIME_COST = int(os.getenv('YOG_ARGON2_TIME_COST', 2))
+
 ##############################################################################
 # DO NOT ADD SETTINGS AFTER THIS LINE
 ##############################################################################

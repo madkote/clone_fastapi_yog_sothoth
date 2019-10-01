@@ -1,4 +1,5 @@
 """API authentication elements."""
+import asyncio
 from typing import NamedTuple
 
 from aioredis import Redis
@@ -72,12 +73,21 @@ async def authenticate_request(
         raise HTTPException(status.HTTP_404_NOT_FOUND,
                             detail='Registration request not found')
 
-    if registration_crud.registration.verify_token(creds.token):
-        # It's a user
-        return APIUser(is_manager=False, rid=creds.rid)
+    # Run verifications in parallel
+    loop = asyncio.get_running_loop()
+    is_user_future = loop.run_in_executor(
+        None,
+        registration_crud.registration.verify_token,
+        creds.token,
+    )
+    is_manager_future = loop.run_in_executor(
+        None,
+        registration_crud.registration.verify_manager_token,
+        creds.token,
+    )
+    is_user, is_manager = await asyncio.gather(is_user_future, is_manager_future)
 
-    if registration_crud.registration.verify_manager_token(creds.token):
-        # It's a manager
-        return APIUser(is_manager=True, rid=creds.rid)
+    if any((is_user, is_manager)):
+        return APIUser(is_manager=is_manager, rid=creds.rid)
 
     raise InvalidUserCredentialsException()

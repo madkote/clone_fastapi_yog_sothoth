@@ -41,6 +41,13 @@ def lint(ctx):
 
 
 @task
+def lint_docker(ctx):
+    """Lint Dockerfile."""
+    ctx.run('sudo docker run --rm -i hadolint/hadolint < Dockerfile', echo=True,
+            pty=True, echo_stdin=False)
+
+
+@task
 def redis(ctx):
     """Run a temporal Redis docker container."""
     ctx.run('sudo docker run --rm --network host redis:5-alpine', echo=True, pty=True,

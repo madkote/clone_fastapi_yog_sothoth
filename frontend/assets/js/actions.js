@@ -17,8 +17,6 @@ function sendAuthenticatedRequest(method, rid, token, objectId, body=null) {
     let url = 'api/v1/registrations/' + rid + '/';
     if (body) {
         body = JSON.stringify(body);
-    } else {
-        body = JSON.stringify({});
     }
     fetch(url, {
         method: method,

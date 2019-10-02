@@ -145,6 +145,10 @@ ARGON2_MEMORY_COST = int(os.getenv('YOG_ARGON2_MEMORY_COST', 102400))
 # Time cost in seconds (defaults to 2)
 ARGON2_TIME_COST = int(os.getenv('YOG_ARGON2_TIME_COST', 2))
 
+# Rate limit (defaults to 5): define upper bound on the number of requests allowed.
+# It uses an exponential back-off mechanism to prevent repeated requests attempt.
+RATE_LIMIT = int(os.getenv('YOG_RATE_LIMIT', 5))
+
 ##############################################################################
 # DO NOT ADD SETTINGS AFTER THIS LINE
 ##############################################################################

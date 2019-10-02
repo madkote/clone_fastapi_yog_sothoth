@@ -1,8 +1,12 @@
 """Application middlewares."""
+from starlette import status
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
 from yog_sothoth.conf import settings
+from yog_sothoth.objects import RateLimit
 from .fastapi import app
 
 # List of defaults for localhost
@@ -25,3 +29,19 @@ app.add_middleware(
     allow_credentials=False,
     max_age=24 * 3600,
 )
+
+
+@app.middleware('http')
+async def rate_limit(request: Request, call_next):
+    """Rate limit clients to avoid spammers/lammers."""
+    identifying_headers = ('user-agent', 'x-forwarded-for', 'x-real-ip')
+    identifier_parts = (request.headers.get(header, '')
+                        for header in identifying_headers)
+    identifier = ':'.join(identifier_parts)
+    limiting = RateLimit(request.app.cache, settings.RATE_LIMIT)
+    if await limiting.verify_below(identifier):
+        response = await call_next(request)
+        return response
+
+    return Response('Maximum allowed requests reached',
+                    status.HTTP_429_TOO_MANY_REQUESTS)

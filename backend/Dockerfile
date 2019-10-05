@@ -24,8 +24,9 @@ RUN pip install --no-cache-dir --requirement poetry.requirements.txt \
 # Install app
 FROM python:3.7-alpine as installer
 
-# Define app version
-ARG APP_VERSION=0.1.0
+# Define app version through build_arg
+ARG APP_VERSION
+RUN : "${APP_VERSION:?Please indicate the application version to install}"
 
 ARG PYTHONUNBUFFERED=1
 
@@ -51,8 +52,8 @@ LABEL description="Docker image for Yog-Sothoth API"
 LABEL maintainer="HacKan <hackan@rlab.be>"
 LABEL vendor="R'lyeh Hacklab Sysadmins"
 LABEL vendor.url="https://adm.rlab.be"
-LABEL url="https://git.rlab.be/sysadmins/matrix-self-register/"
-LABEL version="0.1.0"
+LABEL url="https://git.rlab.be/sysadmins/yog_sothoth/"
+LABEL version="0.2.0"
 LABEL license="GNU GPL v3.0+"
 
 ENV PYTHONUNBUFFERED 1

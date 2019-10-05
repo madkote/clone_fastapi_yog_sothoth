@@ -23,14 +23,26 @@ class RateLimit:
         return f'{cls.__name__}:{hashed_identifier}'
 
     @staticmethod
-    def get_expiration_time(count: int) -> int:
-        """Calculate expiration time using the back-off exponential formula."""
+    def compute_expiration_time(count: int) -> int:
+        """Calculate expiration time using a back-off exponential formula.
+
+        The applied formula is: ⌈(2^C-1)/2+1⌉
+        """
         return ceil(1 / 2 * (2 ** count - 1) + 1)
 
     async def verify_below(self, identifier: str) -> bool:
         """Verify if a key is below given limit."""
         key = self._derive_key(identifier)
         count = await self._cache.incr(key)
-        ttl = self.get_expiration_time(count)
+        ttl = self.compute_expiration_time(count)
         await self._cache.expire(key, ttl)
         return count < self.limit
+
+    async def get_expiration_time(self, identifier: str) -> int:
+        """Get the expiration time of a given identifier.
+
+        :return: The expiration time for the identifier or 0.
+        """
+        key = self._derive_key(identifier)
+        ttl = await self._cache.ttl(key)
+        return ttl if ttl > 0 else 0

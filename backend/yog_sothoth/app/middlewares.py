@@ -43,5 +43,9 @@ async def rate_limit(request: Request, call_next):
         response = await call_next(request)
         return response
 
-    return Response('Maximum allowed requests reached',
-                    status.HTTP_429_TOO_MANY_REQUESTS)
+    retry_after = await limiting.get_expiration_time(identifier)
+    return Response(
+        'Maximum allowed requests reached',
+        status.HTTP_429_TOO_MANY_REQUESTS,
+        {'Retry-After': str(retry_after)},
+    )

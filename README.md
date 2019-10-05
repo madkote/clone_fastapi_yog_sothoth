@@ -26,11 +26,13 @@ Note: the user email is stored in plaintext. This means that a system administra
 
 ### Diagrams
 
-![Successful registration](docs/imgs/successfull_registration.png)
+![Successful registration](docs/imgs/successfull_failed_registration.png)
 
 ![Rejected registration](docs/imgs/rejected_registration.png)
 
-![Failed registration](docs/imgs/failed_registration.png)
+![Deleted registration before approval/reject](docs/imgs/deleted_registration_before.png)
+
+![Deleted registration after approval](docs/imgs/deleted_registration_after.png)
 
 # Deployment
 

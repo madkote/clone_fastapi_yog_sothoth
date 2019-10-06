@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "yog_sothoth"
-version = "0.2.0"
+version = "0.3.0"
 description = "Matrix Self Register"
 license = "GPL-3.0+"
 authors = ["hackan <hackan@rlab.be>", "erus <erus@rlab.be>"]

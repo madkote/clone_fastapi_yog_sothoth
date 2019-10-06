@@ -1,20 +1,20 @@
 # Yog-Sothoth: Matrix Self Register App
 
-A small [FastAPI](https://fastapi.tiangolo.com/) backend and [svelte](https://svelte.dev/) frontend app that allows anyone to register to a Matrix homeserver with admin approval.
+A small [FastAPI](https://fastapi.tiangolo.com/) backend and [svelte](https://svelte.dev/) frontend app that allows anyone to register to a Matrix home server with admin approval.
 
 > Yog-Sothoth knows the gate. Yog-Sothoth is the gate. Yog-Sothoth is the key and guardian of the gate.
 
 ## Basic Flow and Idea
 
-A user creates a new registration sending optionally an email to receive notification. It receives a registration unique identifier (*rid*) and a *token* to access its data. If the user doesn't input an email it will have to manually check how the registration request status is going using its token.
+A user creates a new registration, optionally sending an email to receive notifications. It receives a registration unique identifier (*rid*) and a *token* to access its data. If the user doesn't input an email, it will have to manually check the registration request status using its token. This registration request can be deleted at any time by its owner (anyway, it will be automatically deleted after a certain amount of time, 48hs by default).
 
-When a registration request is received, an email is sent to the managers containing the *manager token* and the registration unique identifier (*rid*). Then any manager can approve or reject the registration using this token.
+When a registration request is received, an email is sent to the managers containing the *manager token* and the registration unique identifier (*rid*). Then, any manager can approve or reject the registration request using this token.
 
-A registration request can be deleted by its user or automatically after a certain amount of time (48hs by default).
+Currently, registration requests status can only be changed once: they're either approved or rejected and that's it.
 
-Currently, registrations can only be updated once: they're either approved or rejected and that's it.
+Once the registration is approved, the user is required to send its username and optionally an email (again, to receive notifications). A password is sent back as response and an account is created in the Matrix home server with the given username (note: it could fail and must be retried from the beginning). 
 
-Once the registration is approved, the user is required to send its username and optionally an email (again, to receive notifications). A password is sent back as response and an account is created in the Matrix homeserver with the given username.
+You can read more about the API in the back-end subdirectory [readme](backend/README.md).
 
 ### Security Characteristics
 
@@ -22,7 +22,7 @@ The user and manager tokens are stored as an Argon2id hash.  The username and pa
 When a manager requests user's data, it will only receive information about the status and timestamps, but won't be able to see any other information.
 Both the user and managers share information using the *rid*. This permits for a user's data to remain unknown for the managers but enables potential human interaction with each other, i.e.: asking in a group if someone sent a registration request.
 
-Note: the user email is stored in plaintext. This means that a system administrator could access the database and see this value (this means a user with root access to the Operating System, not a *manager*).
+Note: the user email is stored in plaintext. This means that a system administrator could access the database and see this value (only a user with root access to the Operating System, not a *manager*).
 
 ### Diagrams
 

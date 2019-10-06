@@ -35,6 +35,7 @@ async def _create_matrix_account(
         logger.exception('Error while trying to create a Matrix account for %s',
                          registration.rid)
         # ToDo: maybe retry a couple of times?
+        # ToDo: maybe return the failure information, removing sensitive data
         account = None
     else:
         logger.info('Matrix account created successfully for %s', registration.rid)

@@ -1,31 +1,11 @@
 # Yog-Sothoth Backend
 
-A small [FastAPI](https://fastapi.tiangolo.com/) based app that allows anyone to register to a Matrix homeserver with admin approval.
+A small [FastAPI](https://fastapi.tiangolo.com/) based app that allows anyone to register to a Matrix home server with admin approval.
 
 It uses a Redis database to temporarily store registration requests. By default, these values will only be stored for 48hs.  
 Secret values are safely stored in an encrypted way.
 
 > Yog-Sothoth knows the gate. Yog-Sothoth is the gate. Yog-Sothoth is the key and guardian of the gate.
-
-## Basic Flow and Idea
-
-A user creates a new registration sending optionally an email to receive notification. It receives a registration unique identifier (*rid*) and a *token* to access its data. If the user doesn't input an email it will have to manually check how the registration request status is going using its token.
-
-When a registration request is received, an email is sent to the managers containing the *manager token* and the registration unique identifier (*rid*). Then any manager can approve or reject the registration using this token.
-
-A registration request can be deleted by its user or automatically after a certain amount of time (48hs by default).
-
-Currently, registrations can only be updated once: they're either approved or rejected and that's it.
-
-Once the registration is approved, the user is required to send its username and optionally an email (again, to receive notifications). A password is sent back as response and an account is created in the Matrix homeserver with the given username.
-
-### Security Characteristics
-
-The user and manager tokens are stored as an Argon2id hash.  The username and password is never stored, only the user email if any (but can not be seen by any manager, no matter what).
-When a manager requests user's data, it will only receive information about the status and timestamps, but won't be able to see any other information.
-Both the user and managers share information using the *rid*. This permits for a user's data to remain unknown for the managers but enables potential human interaction with each other, i.e.: asking in a group if someone sent a registration request.
-
-Note: the user email is stored in plaintext. This means that a system administrator could access the database and see this value (this means a user with root access to the Operating System, not a *manager*).
 
 ## API Endpoints
 
@@ -47,11 +27,24 @@ Since we use FastAPI, we follow OpenAPI. Check `/openapi.json` for full API spec
     * Request: `{"status": "rejected"}` `Authorization: Basic b64(<rid>:<manager_token>)`
     * Response: *200* `{"username": null, "email": null, "password": null, "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "rejected", "matrix_status": "pending"}`, *401*, *403*, *404*, *422*
   * **PATCH**: Create Matrix account once approved.
-    * Request: `{"matrix_status": "processing", "username": "<username>", "email": "[<email>]"}` `Authorization: Basic b64(<rid>:<manager_token>)`
+    * Request: `{"matrix_status": "processing", "username": "<username>", "email": "[<email>]"}` `Authorization: Basic b64(<rid>:<user_token>)`
     * Response: *200* `{"username": "<username>", "email": "<email>", "password": "<password>", "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "approved", "matrix_status": "processing"}`, *401*, *403*, *404*, *422*
   * **DELETE**: Remove registration.
     * Request: `null` `Authorization: Basic b64(<rid>:<user_token>)`
     * Response: *204* `{"username": "<username>", "email": "<email>", "password": "<password>", "rid": "<registration identifier>", "created": "<created datetime>", "modified": "<modified datetime>", "status": "deleted", "matrix_status": "<pending/processing/success/failed>"}`, *401*, *403*, *404*
+
+## Development
+
+Clone this repo and install dependencies with `poetry install`.  
+To run the application you need a Redis server and an SMTP server. These are available to you as the following [Invoke](https://www.pyinvoke.org/) tasks:
+
+* `inv redis`
+* `inv aiosmtpd`
+
+You can then run `inv runserver -d` to launch the application in development mode.  
+Check the `yog_sothoth/conf/global_settings.py` for information about all the settings which can be bypassed by creating a `yog_sothoth/conf/local_settings.py` file.
+
+You can also lint your code with `inv lint` and `inv lint-docker`.
 
 ## License
 

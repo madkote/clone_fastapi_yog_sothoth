@@ -122,9 +122,9 @@ pastel==0.1.1 \
 pkginfo==1.5.0.1 \
     --hash=sha256:7424f2c8511c186cd5424bbf31045b77435b37a8d604990b79d4e70d741148bb \
     --hash=sha256:a6d9e40ca61ad3ebd0b72fbadd4fba16e4c0e4df0428c041e01e06eb6ee71f32
-poetry==1.0.0b1 \
-    --hash=sha256:15a3863a206ef0834b280df23dec454a2babba8769cd7ab1e078cb7a72bcc44c \
-    --hash=sha256:4a78684cec5c8aed9cf842c1759e21b9cb340f257c092cb402ea7a4f98cf57fb
+poetry==1.1.9 \
+    --hash=sha256:481c6264cecf907c47e82216205e7f8486d70e4d54c721b8c3fc651364b0d0ca \
+    --hash=sha256:d4684ff096310de3ce80dff1898f9e249e5bc1c5fe1301c8d5440ded9c305159
 pycparser==2.19; python_version >= "3.5" and python_version < "4.0" and sys_platform == "linux" \
     --hash=sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3
 pylev==1.3.0 \
